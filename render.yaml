@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: appgacha-backend
+    runtime: python:3.11
+    plan: free
+    buildCommand: 'pip install -r requirements.txt'
+    startCommand: 'gunicorn --worker-class gevent --workers 4 --worker-connections 1000 --bind 0.0.0.0:$PORT app_backend_clean:app'
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: CORS_ORIGINS
+        value: '*'
+      - key: JWT_SECRET
+        value: your-secret-key-change-me
+      - key: MONGODB_URI
+        value: ''
+
+databases:
+  - name: appgacha-mongodb
+    databaseName: appgacha
+    plan: free
