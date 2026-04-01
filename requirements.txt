@@ -1,7 +1,7 @@
 # Backend Framework
 Flask==2.3.0
 Flask-CORS==4.0.0
-Flask-SocketIO==5.10.0
+Flask-SocketIO==5.6.1
 Werkzeug==2.3.0
 
 # MongoDB
