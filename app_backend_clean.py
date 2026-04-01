@@ -488,6 +488,131 @@ def get_online_players():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# ============ Socket.io Online Status ============
+# Track connected users in memory
+connected_users = {}  # {user_id: {username, sid, connected_at}}
+
+@socketio.on('connect')
+def handle_connect():
+    """User connects to Socket.io"""
+    print(f"✅ Client connected: {request.sid}")
+
+@socketio.on('user:login')
+def handle_user_login(data):
+    """User logs in - broadcast online event"""
+    try:
+        user_id = data.get('user_id')
+        username = data.get('username')
+
+        if not user_id or not username:
+            emit('error', {'message': 'user_id and username required'})
+            return
+
+        # Store connection
+        connected_users[user_id] = {
+            'username': username,
+            'sid': request.sid,
+            'connected_at': datetime.utcnow().isoformat()
+        }
+
+        # Update MongoDB
+        if db:
+            users = get_collection('users')
+            users.update_one(
+                {'_id': ObjectId(user_id)},
+                {'$set': {'online': True, 'last_online': datetime.utcnow()}}
+            )
+
+        # Broadcast new online user to all clients
+        emit('user:online', {
+            'user_id': user_id,
+            'username': username,
+            'timestamp': datetime.utcnow().isoformat()
+        }, broadcast=True)
+
+        # Send current online users list to new user
+        emitOnlineUsers()
+
+        print(f"✅ {username} online (total: {len(connected_users)})")
+
+    except Exception as e:
+        print(f"❌ Error in user:login: {e}")
+        emit('error', {'message': str(e)})
+
+@socketio.on('user:logout')
+def handle_user_logout(data):
+    """User logs out"""
+    try:
+        user_id = data.get('user_id')
+        username = data.get('username')
+
+        if user_id in connected_users:
+            del connected_users[user_id]
+
+        # Update MongoDB
+        if db:
+            users = get_collection('users')
+            users.update_one(
+                {'_id': ObjectId(user_id)},
+                {'$set': {'online': False}}
+            )
+
+        # Broadcast user gone offline
+        emit('user:offline', {
+            'user_id': user_id,
+            'username': username,
+            'timestamp': datetime.utcnow().isoformat()
+        }, broadcast=True)
+
+        print(f"❌ {username} offline (total: {len(connected_users)})")
+
+    except Exception as e:
+        print(f"❌ Error in user:logout: {e}")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    """User disconnects from Socket.io"""
+    # Find and remove user
+    for user_id, user_data in list(connected_users.items()):
+        if user_data['sid'] == request.sid:
+            username = user_data['username']
+            del connected_users[user_id]
+
+            # Update MongoDB
+            if db:
+                users = get_collection('users')
+                users.update_one(
+                    {'_id': ObjectId(user_id)},
+                    {'$set': {'online': False}}
+                )
+
+            # Broadcast disconnect event
+            socketio.emit('user:offline', {
+                'user_id': user_id,
+                'username': username,
+                'timestamp': datetime.utcnow().isoformat()
+            }, broadcast=True)
+
+            print(f"❌ {username} disconnected (total: {len(connected_users)})")
+            break
+
+@socketio.on('online-users:request')
+def handle_online_users_request():
+    """Client requests current online users list"""
+    emitOnlineUsers()
+
+def emitOnlineUsers():
+    """Emit current online users to all connected clients"""
+    online_list = [
+        {
+            'user_id': uid,
+            'username': data['username'],
+            'connected_at': data['connected_at']
+        }
+        for uid, data in connected_users.items()
+    ]
+    socketio.emit('online-users:list', {'users': online_list}, broadcast=True)
+
 # ============ Run App ============
 if __name__ == '__main__':
     print(f"\n{'='*50}")
