@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Honkai: Star Rail - Gacha Simulator</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          'Segoe UI',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Helvetica Neue',
+          sans-serif;
+        background: linear-gradient(135deg, #0a0e27 0%, #1a0f2e 50%, #0f1a2e 100%);
+        min-height: 100vh;
+        padding: 20px;
+        color: white;
+        overflow-x: hidden;
+      }
+
+      .scene {
+        perspective: 1000px;
+        position: relative;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+        position: relative;
+        z-index: 10;
+      }
+
+      .header h1 {
+        font-size: 48px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffa500 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+        text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        letter-spacing: 2px;
+      }
+
+      .header p {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.7);
+        letter-spacing: 2px;
+      }
+
+      .banners-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 40px;
+        margin-bottom: 60px;
+      }
+
+      .banner-container {
+        perspective: 1000px;
+        position: relative;
+        height: 500px;
+      }
+
+      .banner {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1a0f2e 0%, #2d1b4e 50%, #1a0f2e 100%);
+        border: 2px solid rgba(138, 108, 255, 0.4);
+        border-radius: 16px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform-style: preserve-3d;
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.5),
+          0 0 40px rgba(138, 108, 255, 0.2);
+      }
+
+      .banner:hover {
+        transform: rotateY(-5deg) rotateX(3deg) translateZ(20px);
+        box-shadow:
+          0 30px 80px rgba(0, 0, 0, 0.6),
+          0 0 60px rgba(138, 108, 255, 0.4);
+      }
+
+      .banner-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+          circle at 70% 30%,
+          rgba(168, 108, 255, 0.1) 0%,
+          transparent 50%
+        );
+        pointer-events: none;
+      }
+
+      .banner-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-between;
+      }
+
+      .banner-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #ffd700;
+        margin-bottom: 12px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        letter-spacing: 1px;
+      }
+
+      .banner-description {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 16px;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .banner-character {
+        position: absolute;
+        right: -20px;
+        bottom: 0;
+        width: 280px;
+        height: 320px;
+        background: linear-gradient(135deg, rgba(168, 108, 255, 0.2) 0%, transparent 100%);
+        border-radius: 0 12px 12px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.9;
+        transform: skewY(-3deg);
+      }
+
+      .character-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(1.1) contrast(1.1);
+        transform: scaleX(-1) translateY(20px);
+      }
+
+      .banner-rarity {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 12px;
+      }
+
+      .star {
+        font-size: 18px;
+      }
+
+      .banner-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .banner-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn-small {
+        padding: 8px 16px;
+        background: rgba(138, 108, 255, 0.3);
+        border: 1px solid rgba(138, 108, 255, 0.5);
+        color: #a86cff;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .btn-small:hover {
+        background: rgba(138, 108, 255, 0.5);
+        transform: translateY(-2px);
+      }
+
+      .btn-pull {
+        padding: 10px 24px;
+        background: linear-gradient(135deg, #00d084 0%, #00a86b 100%);
+        border: none;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(0, 208, 132, 0.3);
+        position: relative;
+        z-index: 10;
+      }
+
+      .btn-pull:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 208, 132, 0.5);
+      }
+
+      .rarity-display {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .stats-section {
+        margin-top: 60px;
+        padding: 30px;
+        background: rgba(15, 15, 30, 0.8);
+        border: 2px solid rgba(138, 108, 255, 0.3);
+        border-radius: 12px;
+        text-align: center;
+      }
+
+      .stats-section h2 {
+        color: #ffd700;
+        margin-bottom: 20px;
+        font-size: 24px;
+      }
+
+      .navbar {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 12px;
+        background: rgba(15, 15, 30, 0.9);
+        padding: 16px 24px;
+        border-radius: 12px;
+        border: 2px solid rgba(138, 108, 255, 0.3);
+        z-index: 100;
+      }
+
+      .nav-btn {
+        padding: 10px 20px;
+        background: rgba(138, 108, 255, 0.2);
+        border: 1px solid rgba(138, 108, 255, 0.4);
+        color: #a86cff;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 1px;
+      }
+
+      .nav-btn:hover {
+        background: rgba(138, 108, 255, 0.4);
+        transform: translateY(-2px);
+      }
+
+      .nav-btn.active {
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        color: #0a0e27;
+        border-color: #ffd700;
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 32px;
+        }
+
+        .banners-grid {
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+
+        .banner-container {
+          height: 400px;
+        }
+
+        .banner-character {
+          width: 220px;
+          height: 260px;
+        }
+
+        .navbar {
+          width: calc(100% - 40px);
+          gap: 8px;
+        }
+
+        .nav-btn {
+          padding: 8px 12px;
+          font-size: 11px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scene">
+      <div class="container">
+        <!-- Header -->
+        <div class="header">
+          <h1>✨ HONKAI: STAR RAIL ✨</h1>
+          <p>仙舟「罗浮」 · 深空邂逅</p>
+        </div>
+
+        <!-- Banners Grid -->
+        <div class="banners-grid">
+          <!-- Banner 1: 5-Star Character Banner -->
+          <div class="banner-container">
+            <div class="banner">
+              <div class="banner-bg"></div>
+              <div class="banner-content">
+                <div>
+                  <div class="banner-title">仙舟旅人 · 丹恒·云骑</div>
+                  <div class="banner-description">
+                    限定五星角色。强大的冰属性单体输出，能够造成双倍伤害。获得专属光锥时效果更佳。
+                  </div>
+                  <div class="banner-rarity">
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                  </div>
+                </div>
+
+                <div class="banner-footer">
+                  <div class="rarity-display">5-Star UP</div>
+                  <div class="banner-buttons">
+                    <button class="btn-small">规则</button>
+                    <button class="btn-pull">抽取</button>
+                  </div>
+                </div>
+
+                <div class="banner-character">
+                  <div style="font-size: 120px; opacity: 0.3">🎨</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Banner 2: 4-Star Character Banner -->
+          <div class="banner-container">
+            <div class="banner">
+              <div class="banner-bg"></div>
+              <div class="banner-content">
+                <div>
+                  <div class="banner-title">群星共鸣 · 栅栏四星</div>
+                  <div class="banner-description">
+                    限定四星角色群集。高效率获取4星角色与光锥材料，是积攒资源的最佳选择。
+                  </div>
+                  <div class="banner-rarity">
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                  </div>
+                </div>
+
+                <div class="banner-footer">
+                  <div class="rarity-display">4-Star UP</div>
+                  <div class="banner-buttons">
+                    <button class="btn-small">规则</button>
+                    <button class="btn-pull">抽取</button>
+                  </div>
+                </div>
+
+                <div class="banner-character">
+                  <div style="font-size: 120px; opacity: 0.3">🎨</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Banner 3: Weapon Banner -->
+          <div class="banner-container">
+            <div class="banner">
+              <div class="banner-bg"></div>
+              <div class="banner-content">
+                <div>
+                  <div class="banner-title">光锥跃迁 · 传奇武器</div>
+                  <div class="banner-description">
+                    获得限定5星光锥几率提升。配合角色使用，能够最大化战斗效果。
+                  </div>
+                  <div class="banner-rarity">
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                    <span class="star">⭐</span>
+                  </div>
+                </div>
+
+                <div class="banner-footer">
+                  <div class="rarity-display">Light Cone</div>
+                  <div class="banner-buttons">
+                    <button class="btn-small">规则</button>
+                    <button class="btn-pull">抽取</button>
+                  </div>
+                </div>
+
+                <div class="banner-character">
+                  <div style="font-size: 120px; opacity: 0.3">🌟</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Bar -->
+        <div class="navbar">
+          <button class="nav-btn active">🎪 官方</button>
+          <button class="nav-btn">⚙️ 设置</button>
+          <button class="nav-btn">📜 历史</button>
+          <button class="nav-btn">🎯 统计</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 3D Tilt effect
+      document.querySelectorAll('.banner').forEach((banner) => {
+        banner.addEventListener('mousemove', function (e) {
+          const rect = this.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+
+          const rotateX = (y - centerY) / 10;
+          const rotateY = (centerX - x) / 10;
+
+          this.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+        });
+
+        banner.addEventListener('mouseleave', function () {
+          this.style.transform = 'rotateX(0) rotateY(0) translateZ(0)';
+        });
+      });
+
+      // Button interactions
+      document.querySelectorAll('.btn-pull').forEach((btn) => {
+        btn.addEventListener('click', function () {
+          alert('🎲 开始抽取！');
+        });
+      });
+    </script>
+  </body>
+</html>

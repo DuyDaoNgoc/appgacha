@@ -1,0 +1,13 @@
+{
+	"appId": "com.gachasimulator.app",
+	"appName": "Gacha Simulator",
+	"webDir": "www",
+	"server": {
+		"androidScheme": "https"
+	},
+	"plugins": {
+		"ScreenOrientation": {
+			"orientation": "sensorLandscape"
+		}
+	}
+}

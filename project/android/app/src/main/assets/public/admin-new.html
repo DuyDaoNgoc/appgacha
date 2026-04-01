@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>👑 Admin Gacha Control Panel</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          'Segoe UI',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Helvetica Neue',
+          sans-serif;
+        background: linear-gradient(135deg, #0f0f1e 0%, #1a0f2e 50%, #0f1a2e 100%);
+        min-height: 100vh;
+        padding: 20px;
+        color: white;
+      }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .login-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+      .login-modal.hidden {
+        display: none;
+      }
+      .login-container {
+        background: linear-gradient(135deg, rgba(26, 15, 46, 0.95) 0%, rgba(15, 26, 46, 0.95) 100%);
+        border: 2px solid rgba(168, 108, 255, 0.4);
+        border-radius: 12px;
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      }
+      .login-container h2 {
+        color: #ffd700;
+        margin-bottom: 30px;
+        text-align: center;
+        font-size: 28px;
+      }
+      .login-container .form-group {
+        margin-bottom: 20px;
+      }
+      .login-container label {
+        display: block;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .login-container input {
+        width: 100%;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(168, 108, 255, 0.2);
+        border-radius: 6px;
+        color: white;
+        font-size: 14px;
+      }
+      .login-container input:focus {
+        outline: none;
+        border-color: rgba(168, 108, 255, 0.8);
+        box-shadow: 0 0 15px rgba(168, 108, 255, 0.3);
+      }
+      .login-container .btn-primary {
+        width: 100%;
+        padding: 14px;
+        margin-top: 10px;
+      }
+      .hint {
+        margin-top: 15px;
+        font-size: 12px;
+        color: #a86cff;
+        text-align: center;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid rgba(168, 108, 255, 0.2);
+      }
+      .header h1 {
+        font-size: 32px;
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .header-controls {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+      }
+      .admin-info {
+        color: #a86cff;
+        font-size: 14px;
+        padding: 8px 15px;
+        background: rgba(168, 108, 255, 0.1);
+        border-radius: 6px;
+      }
+      .tab-navigation {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+      }
+      .tab-btn {
+        padding: 12px 20px;
+        background: rgba(138, 108, 255, 0.1);
+        border: 2px solid rgba(138, 108, 255, 0.2);
+        color: rgba(255, 255, 255, 0.7);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+      }
+      .tab-btn.active {
+        background: linear-gradient(135deg, #a86cff 0%, #7c3aed 100%);
+        border-color: transparent;
+        color: white;
+        box-shadow: 0 4px 15px rgba(168, 108, 255, 0.4);
+      }
+      .tab-btn:hover {
+        background: rgba(138, 108, 255, 0.2);
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+      @media (max-width: 1024px) {
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .section {
+        background: rgba(15, 15, 30, 0.85);
+        border: 2px solid rgba(138, 108, 255, 0.3);
+        border-radius: 12px;
+        padding: 25px;
+      }
+      .section h2 {
+        color: #ffd700;
+        margin-bottom: 20px;
+        font-size: 20px;
+      }
+      .section h3 {
+        color: #a86cff;
+        margin-top: 20px;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      label {
+        display: block;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 6px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      input[type='text'],
+      input[type='password'],
+      input[type='number'],
+      input[type='file'],
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 12px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(138, 108, 255, 0.2);
+        border-radius: 6px;
+        color: white;
+        font-size: 14px;
+        font-family: inherit;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: rgba(138, 108, 255, 0.6);
+        box-shadow: 0 0 10px rgba(138, 108, 255, 0.2);
+      }
+      button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, #a86cff 0%, #7c3aed 100%);
+        color: white;
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(168, 108, 255, 0.4);
+      }
+      .btn-secondary {
+        background: rgba(138, 108, 255, 0.2);
+        color: #a86cff;
+        border: 1px solid rgba(138, 108, 255, 0.4);
+      }
+      .btn-secondary:hover {
+        background: rgba(138, 108, 255, 0.3);
+      }
+      .btn-danger {
+        background: rgba(255, 107, 107, 0.2);
+        color: #ff9999;
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .btn-danger:hover {
+        background: rgba(255, 107, 107, 0.4);
+      }
+      .logout-btn {
+        padding: 10px 15px;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 100%);
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 13px;
+      }
+      .logout-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+      }
+      .message {
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        display: none;
+      }
+      .message.show {
+        display: block;
+      }
+      .message.success {
+        background: rgba(76, 175, 80, 0.2);
+        border: 1px solid rgba(76, 175, 80, 0.4);
+        color: #81c784;
+      }
+      .message.error {
+        background: rgba(255, 107, 107, 0.2);
+        border: 1px solid rgba(255, 107, 107, 0.4);
+        color: #ff9999;
+      }
+      .character-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      .character-card {
+        background: rgba(0, 0, 0, 0.2);
+        border: 3px solid rgba(138, 108, 255, 0.2);
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+      .character-card.r3 {
+        border-left-color: #4fc3f7;
+      }
+      .character-card.r4 {
+        border-left-color: #ba68c8;
+      }
+      .character-card.r5 {
+        border-left-color: #ffd700;
+      }
+      .character-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(168, 108, 255, 0.3);
+      }
+      .character-emoji {
+        font-size: 36px;
+        margin-bottom: 5px;
+      }
+      .character-name {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .character-rarity {
+        font-size: 11px;
+        color: #a86cff;
+        margin-top: 5px;
+      }
+      .delete-btn {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        background: rgba(255, 107, 107, 0.8);
+        border: none;
+        color: white;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .stat-box {
+        background: rgba(138, 108, 255, 0.1);
+        border: 1px solid rgba(138, 108, 255, 0.3);
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+      }
+      .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #ffd700;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 5px;
+      }
+      .player-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .player-table th {
+        background: rgba(138, 108, 255, 0.2);
+        padding: 12px;
+        text-align: left;
+        color: #a86cff;
+        border-bottom: 2px solid rgba(138, 108, 255, 0.3);
+      }
+      .player-table td {
+        padding: 12px;
+        border-bottom: 1px solid rgba(138, 108, 255, 0.1);
+      }
+      .player-table tr:hover {
+        background: rgba(138, 108, 255, 0.05);
+      }
+      .search-box {
+        margin-bottom: 15px;
+      }
+      .search-box input {
+        width: 100%;
+      }
+      .rarity-colors {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+      }
+      .rarity-badge {
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        background: rgba(138, 108, 255, 0.1);
+        border: 2px solid rgba(138, 108, 255, 0.2);
+        color: rgba(255, 255, 255, 0.7);
+        transition: all 0.2s ease;
+      }
+      .rarity-badge.active {
+        background: linear-gradient(135deg, #a86cff 0%, #7c3aed 100%);
+        border-color: transparent;
+        color: white;
+      }
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="login-modal">
+      <div class="login-container">
+        <h2>🔐 Admin Login</h2>
+        <div id="loginMessage" class="message"></div>
+        <div class="form-group">
+          <label for="adminUsername">Username:</label>
+          <input type="text" id="adminUsername" placeholder="admin" />
+        </div>
+        <div class="form-group">
+          <label for="adminPassword">Password:</label>
+          <input type="password" id="adminPassword" placeholder="password" />
+        </div>
+        <button class="btn-primary" onclick="adminLogin()" style="width: 100%">🔓 Login</button>
+        <p class="hint">Demo: admin / 123456</p>
+      </div>
+    </div>
+
+    <!-- MAIN PANEL -->
+    <div class="container" id="mainPanel" style="display: none">
+      <!-- HEADER -->
+      <div class="header">
+        <h1>✨ Admin Gacha Control Panel ✨</h1>
+        <div class="header-controls">
+          <div class="admin-info">Admin: <strong id="currentAdmin"></strong></div>
+          <button class="logout-btn" onclick="adminLogout()">🚪 Logout</button>
+          <button class="logout-btn" onclick="location.href = 'home.html'">🏠 Home</button>
+        </div>
+      </div>
+
+      <!-- TAB NAVIGATION -->
+      <div class="tab-navigation">
+        <button class="tab-btn active" onclick="switchTab('characters')">📚 Characters</button>
+        <button class="tab-btn" onclick="switchTab('distribute')">💝 Distribution</button>
+        <button class="tab-btn" onclick="switchTab('users')">👥 Players</button>
+        <button class="tab-btn" onclick="switchTab('analytics')">📊 Analytics</button>
+        <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+      </div>
+
+      <!-- TAB 1: CHARACTERS -->
+      <div class="tab-content active" id="tab-characters">
+        <div class="content-grid">
+          <div class="section">
+            <h2>➕ Add New Character</h2>
+            <div id="addMessage" class="message"></div>
+            <div class="form-group">
+              <label for="charName">Character Name:</label>
+              <input type="text" id="charName" placeholder="e.g., Kafka" />
+            </div>
+            <div class="form-group">
+              <label>Rarity:</label>
+              <div class="rarity-colors">
+                <div class="rarity-badge active" onclick="selectRarity(3)">⭐ 3-Star</div>
+                <div class="rarity-badge" onclick="selectRarity(4)">⭐ 4-Star</div>
+                <div class="rarity-badge" onclick="selectRarity(5)">⭐ 5-Star</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="charEmoji">Emoji:</label>
+              <input type="text" id="charEmoji" placeholder="🔥" maxlength="2" />
+            </div>
+            <button class="btn-primary" onclick="addCharacter()">➕ Add Character</button>
+          </div>
+          <div class="section">
+            <h2>📋 Character List</h2>
+            <div class="stats">
+              <div class="stat-box">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Total</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="rarity5Count">0</div>
+                <div class="stat-label">5-Star</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="rarity4Count">0</div>
+                <div class="stat-label">4-Star</div>
+              </div>
+            </div>
+            <div class="character-list" id="characterList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: DISTRIBUTION -->
+      <div class="tab-content" id="tab-distribute">
+        <div class="content-grid">
+          <div class="section">
+            <h2>💰 Send Xu</h2>
+            <div id="xuMessage" class="message"></div>
+            <div class="form-group">
+              <label for="xuUsername">Player Username:</label>
+              <input type="text" id="xuUsername" placeholder="username" />
+            </div>
+            <div class="form-group">
+              <label for="xuAmount">Amount:</label>
+              <input type="number" id="xuAmount" placeholder="1000" value="1000" />
+            </div>
+            <div class="form-group">
+              <label for="xuReason">Reason:</label>
+              <textarea id="xuReason" placeholder="Daily Reward" style="height: 80px"></textarea>
+            </div>
+            <button class="btn-primary" onclick="sendXu()">💝 Send Xu</button>
+          </div>
+          <div class="section">
+            <h2>⭐ Send Stars</h2>
+            <div id="starsMessage" class="message"></div>
+            <div class="form-group">
+              <label for="starsUsername">Player Username:</label>
+              <input type="text" id="starsUsername" placeholder="username" />
+            </div>
+            <div class="form-group">
+              <label for="starsAmount">Amount:</label>
+              <input type="number" id="starsAmount" placeholder="100" value="100" />
+            </div>
+            <div class="form-group">
+              <label for="starsReason">Reason:</label>
+              <textarea id="starsReason" placeholder="Event Reward" style="height: 80px"></textarea>
+            </div>
+            <button class="btn-primary" onclick="sendStars()">⭐ Send Stars</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: PLAYERS -->
+      <div class="tab-content" id="tab-users">
+        <div class="section">
+          <h2>👥 Player Management</h2>
+          <div class="search-box">
+            <input
+              type="text"
+              id="playerSearch"
+              placeholder="🔍 Search player..."
+              onkeyup="filterPlayers()"
+            />
+          </div>
+          <div style="max-height: 600px; overflow-y: auto">
+            <table class="player-table" id="playersTable">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Xu</th>
+                  <th>Stars</th>
+                  <th>Tx</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="playersTableBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; color: #a86cff">No players yet</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ANALYTICS -->
+      <div class="tab-content" id="tab-analytics">
+        <div class="content-grid">
+          <div class="section">
+            <h2>📊 System Statistics</h2>
+            <div class="stats" style="grid-template-columns: 1fr">
+              <div class="stat-box">
+                <div class="stat-value" id="statPlayers">0</div>
+                <div class="stat-label">Total Players</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="statTotalXu">0</div>
+                <div class="stat-label">Xu Distributed</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="statTotalStars">0</div>
+                <div class="stat-label">Stars Distributed</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="statTransactions">0</div>
+                <div class="stat-label">Total Transactions</div>
+              </div>
+            </div>
+          </div>
+          <div class="section">
+            <h2>🎲 Gacha Statistics</h2>
+            <div class="stats" style="grid-template-columns: 1fr">
+              <div class="stat-box">
+                <div class="stat-value" id="statTotalChars">0</div>
+                <div class="stat-label">Total Characters</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="statRarity5Chars">0</div>
+                <div class="stat-label">5-Star</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="statRarity4Chars">0</div>
+                <div class="stat-label">4-Star</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="statRarity3Chars">0</div>
+                <div class="stat-label">3-Star</div>
+              </div>
+            </div>
+            <h3 style="margin-top: 25px">📈 Distribution Analysis</h3>
+            <div
+              id="distributionAnalysis"
+              style="color: rgba(255, 255, 255, 0.8); line-height: 1.8"
+            >
+              <p>✅ Xu: 0 transactions</p>
+              <p>✅ Stars: 0 transactions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: SETTINGS -->
+      <div class="tab-content" id="tab-settings">
+        <div class="content-grid">
+          <div class="section">
+            <h2>⚙️ System Settings</h2>
+            <h3>Gacha Rates</h3>
+            <div class="form-group">
+              <label for="rate5Star">5-Star Rate (%):</label>
+              <input type="number" id="rate5Star" value="3" min="0" max="100" />
+            </div>
+            <div class="form-group">
+              <label for="rate4Star">4-Star Rate (%):</label>
+              <input type="number" id="rate4Star" value="12" min="0" max="100" />
+            </div>
+            <button class="btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+          </div>
+          <div class="section">
+            <h2>💾 Data Management</h2>
+            <h3>Export Data</h3>
+            <button
+              class="btn-secondary"
+              onclick="exportCharacters()"
+              style="width: 100%; margin-bottom: 10px"
+            >
+              📥 Export Characters
+            </button>
+            <button
+              class="btn-secondary"
+              onclick="exportPlayers()"
+              style="width: 100%; margin-bottom: 20px"
+            >
+              📥 Export Players
+            </button>
+            <h3>Danger Zone</h3>
+            <button class="btn-danger" onclick="clearAllData()" style="width: 100%">
+              🗑️ Clear All Data
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentAdmin = null;
+      let selectedRarity = 3;
+
+      function adminLogin() {
+        const username = document.getElementById('adminUsername').value.trim();
+        const password = document.getElementById('adminPassword').value.trim();
+        const msg = document.getElementById('loginMessage');
+
+        if (!username || !password) {
+          showMessage(msg, '❌ Vui lòng nhập đủ thông tin!', 'error');
+          return;
+        }
+
+        if (username === 'admin' && password === '123456') {
+          currentAdmin = username;
+          sessionStorage.setItem('adminUser', username);
+          document.getElementById('currentAdmin').innerText = username;
+          document.getElementById('loginModal').classList.add('hidden');
+          document.getElementById('mainPanel').style.display = 'block';
+          loadCharacters();
+          loadPlayers();
+          updateAnalytics();
+          showMessage(msg, '✅ Đăng nhập thành công!', 'success');
+        } else {
+          showMessage(msg, '❌ Sai tài khoản hoặc mật khẩu!', 'error');
+        }
+      }
+
+      function adminLogout() {
+        if (confirm('Bạn chắc chắn muốn đăng xuất?')) {
+          currentAdmin = null;
+          sessionStorage.removeItem('adminUser');
+          document.getElementById('loginModal').classList.remove('hidden');
+          document.getElementById('mainPanel').style.display = 'none';
+          document.getElementById('adminUsername').value = '';
+          document.getElementById('adminPassword').value = '';
+        }
+      }
+
+      function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach((tab) => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+        event.target.classList.add('active');
+        if (tabName === 'users') loadPlayers();
+        else if (tabName === 'analytics') updateAnalytics();
+      }
+
+      function showMessage(container, text, type) {
+        container.innerText = text;
+        container.className = 'message show ' + type;
+        setTimeout(() => container.classList.remove('show'), 3000);
+      }
+
+      function selectRarity(rarity) {
+        selectedRarity = rarity;
+        document.querySelectorAll('.rarity-badge').forEach((b) => b.classList.remove('active'));
+        event.target.classList.add('active');
+      }
+
+      function addCharacter() {
+        const name = document.getElementById('charName').value.trim();
+        const emoji = document.getElementById('charEmoji').value.trim();
+        const msg = document.getElementById('addMessage');
+
+        if (!name || !emoji) {
+          showMessage(msg, '❌ Vui lòng nhập đủ thông tin!', 'error');
+          return;
+        }
+
+        const charId = Date.now();
+        const newChar = { id: charId, name, emoji, rarity: selectedRarity };
+
+        // Lưu vào gachaCharacters (Admin list)
+        let characters = JSON.parse(localStorage.getItem('gachaCharacters') || '[]');
+        characters.push(newChar);
+        localStorage.setItem('gachaCharacters', JSON.stringify(characters));
+
+        // Lưu vào banners (User sẽ roll được)
+        let banners = JSON.parse(localStorage.getItem('banners') || '[]');
+        banners.push({ ...newChar, addedAt: new Date().toISOString() });
+        localStorage.setItem('banners', JSON.stringify(banners));
+
+        showMessage(msg, `✅ Đã thêm ${name} (${selectedRarity}⭐) vào gacha banner!`, 'success');
+        document.getElementById('charName').value = '';
+        document.getElementById('charEmoji').value = '';
+        loadCharacters();
+      }
+
+      function loadCharacters() {
+        const characters = JSON.parse(localStorage.getItem('gachaCharacters') || '[]');
+        const list = document.getElementById('characterList');
+
+        if (characters.length === 0) {
+          list.innerHTML =
+            '<p style="grid-column: 1/-1; text-align: center; color: #a86cff;">Chưa có character</p>';
+        } else {
+          list.innerHTML = characters
+            .map(
+              (char) => `
+          <div class="character-card r${char.rarity}">
+            <button class="delete-btn" onclick="deleteCharacter(${char.id})">×</button>
+            <div class="character-emoji">${char.emoji}</div>
+            <div class="character-name">${char.name}</div>
+            <div class="character-rarity">⭐ ${char.rarity}-Star</div>
+          </div>
+        `
+            )
+            .join('');
+        }
+
+        const r5 = characters.filter((c) => c.rarity === 5).length;
+        const r4 = characters.filter((c) => c.rarity === 4).length;
+        document.getElementById('totalCount').innerText = characters.length;
+        document.getElementById('rarity5Count').innerText = r5;
+        document.getElementById('rarity4Count').innerText = r4;
+      }
+
+      function deleteCharacter(id) {
+        if (confirm('Xóa character này?')) {
+          let characters = JSON.parse(localStorage.getItem('gachaCharacters') || '[]');
+          characters = characters.filter((c) => c.id !== id);
+          localStorage.setItem('gachaCharacters', JSON.stringify(characters));
+          loadCharacters();
+        }
+      }
+
+      function sendXu() {
+        const username = document.getElementById('xuUsername').value.trim();
+        const amount = parseInt(document.getElementById('xuAmount').value);
+        const reason = document.getElementById('xuReason').value.trim();
+        const msg = document.getElementById('xuMessage');
+
+        if (!username || !amount || amount <= 0) {
+          showMessage(msg, '❌ Vui lòng nhập đủ thông tin!', 'error');
+          return;
+        }
+
+        let resources = JSON.parse(localStorage.getItem('adminResources') || '{}');
+        if (!resources[username]) resources[username] = { xu: 0, stars: 0, history: [] };
+        resources[username].xu = (resources[username].xu || 0) + amount;
+        resources[username].history.push({
+          type: 'xu',
+          amount,
+          reason: reason || 'Admin Gift',
+          date: new Date().toLocaleString('vi-VN'),
+        });
+
+        localStorage.setItem('adminResources', JSON.stringify(resources));
+        showMessage(msg, `✅ Đã gửi ${amount} Xu cho ${username}!`, 'success');
+        document.getElementById('xuUsername').value = '';
+        document.getElementById('xuAmount').value = '1000';
+        document.getElementById('xuReason').value = '';
+        loadPlayers();
+        updateAnalytics();
+      }
+
+      function sendStars() {
+        const username = document.getElementById('starsUsername').value.trim();
+        const amount = parseInt(document.getElementById('starsAmount').value);
+        const reason = document.getElementById('starsReason').value.trim();
+        const msg = document.getElementById('starsMessage');
+
+        if (!username || !amount || amount <= 0) {
+          showMessage(msg, '❌ Vui lòng nhập đủ thông tin!', 'error');
+          return;
+        }
+
+        let resources = JSON.parse(localStorage.getItem('adminResources') || '{}');
+        if (!resources[username]) resources[username] = { xu: 0, stars: 0, history: [] };
+        resources[username].stars = (resources[username].stars || 0) + amount;
+        resources[username].history.push({
+          type: 'stars',
+          amount,
+          reason: reason || 'Admin Gift',
+          date: new Date().toLocaleString('vi-VN'),
+        });
+
+        localStorage.setItem('adminResources', JSON.stringify(resources));
+        showMessage(msg, `✅ Đã gửi ${amount} Stars cho ${username}!`, 'success');
+        document.getElementById('starsUsername').value = '';
+        document.getElementById('starsAmount').value = '100';
+        document.getElementById('starsReason').value = '';
+        loadPlayers();
+        updateAnalytics();
+      }
+
+      function loadPlayers() {
+        const resources = JSON.parse(localStorage.getItem('adminResources') || '{}');
+        const tbody = document.getElementById('playersTableBody');
+
+        if (Object.keys(resources).length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="5" style="text-align: center; color: #a86cff;">Chưa có player</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = Object.entries(resources)
+          .map(([username, data]) => {
+            const txCount = (data.history || []).length;
+            return `<tr><td>${username}</td><td>${data.xu || 0}</td><td>${data.stars || 0}</td><td>${txCount}</td><td><button class="btn-secondary" onclick="showPlayerHistory('${username}')" style="font-size: 11px; padding: 6px 10px;">📜</button></td></tr>`;
+          })
+          .join('');
+      }
+
+      function showPlayerHistory(username) {
+        const resources = JSON.parse(localStorage.getItem('adminResources') || '{}');
+        const data = resources[username];
+        if (!data || !data.history) {
+          alert('Không có giao dịch');
+          return;
+        }
+        let historyText = `Lịch sử ${username}:\n\n`;
+        data.history.forEach((tx) => {
+          historyText += `[${tx.date}] ${tx.type.toUpperCase()}: +${tx.amount} (${tx.reason})\n`;
+        });
+        alert(historyText);
+      }
+
+      function filterPlayers() {
+        const search = document.getElementById('playerSearch').value.toLowerCase();
+        const resources = JSON.parse(localStorage.getItem('adminResources') || '{}');
+        const tbody = document.getElementById('playersTableBody');
+
+        const filtered = Object.entries(resources).filter(([username]) =>
+          username.toLowerCase().includes(search)
+        );
+
+        tbody.innerHTML =
+          filtered.length === 0
+            ? '<tr><td colspan="5" style="text-align: center; color: #a86cff;">Không tìm thấy</td></tr>'
+            : filtered
+                .map(([username, data]) => {
+                  const txCount = (data.history || []).length;
+                  return `<tr><td>${username}</td><td>${data.xu || 0}</td><td>${data.stars || 0}</td><td>${txCount}</td><td><button class="btn-secondary" onclick="showPlayerHistory('${username}')" style="font-size: 11px; padding: 6px 10px;">📜</button></td></tr>`;
+                })
+                .join('');
+      }
+
+      function updateAnalytics() {
+        const resources = JSON.parse(localStorage.getItem('adminResources') || '{}');
+        const characters = JSON.parse(localStorage.getItem('gachaCharacters') || '[]');
+
+        document.getElementById('statPlayers').innerText = Object.keys(resources).length;
+
+        let totalXu = 0,
+          totalStars = 0,
+          totalTx = 0,
+          xuTx = 0,
+          starsTx = 0;
+        Object.values(resources).forEach((data) => {
+          totalXu += data.xu || 0;
+          totalStars += data.stars || 0;
+          (data.history || []).forEach((tx) => {
+            totalTx++;
+            if (tx.type === 'xu') xuTx++;
+            else starsTx++;
+          });
+        });
+
+        document.getElementById('statTotalXu').innerText = totalXu;
+        document.getElementById('statTotalStars').innerText = totalStars;
+        document.getElementById('statTransactions').innerText = totalTx;
+
+        const r5 = characters.filter((c) => c.rarity === 5).length;
+        const r4 = characters.filter((c) => c.rarity === 4).length;
+        const r3 = characters.filter((c) => c.rarity === 3).length;
+
+        document.getElementById('statTotalChars').innerText = characters.length;
+        document.getElementById('statRarity5Chars').innerText = r5;
+        document.getElementById('statRarity4Chars').innerText = r4;
+        document.getElementById('statRarity3Chars').innerText = r3;
+
+        document.getElementById('distributionAnalysis').innerHTML = `
+        <p>✅ Xu: ${xuTx} giao dịch | ${totalXu} Xu</p>
+        <p>✅ Stars: ${starsTx} giao dịch | ${totalStars} Stars</p>
+      `;
+      }
+
+      function saveSettings() {
+        localStorage.setItem('gacha_rate_5star', document.getElementById('rate5Star').value);
+        localStorage.setItem('gacha_rate_4star', document.getElementById('rate4Star').value);
+        alert('✅ Đã lưu!');
+      }
+
+      function exportCharacters() {
+        const characters = JSON.parse(localStorage.getItem('gachaCharacters') || '[]');
+        const blob = new Blob([JSON.stringify(characters, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `characters-${Date.now()}.json`;
+        a.click();
+      }
+
+      function exportPlayers() {
+        const resources = JSON.parse(localStorage.getItem('adminResources') || '{}');
+        const blob = new Blob([JSON.stringify(resources, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `players-${Date.now()}.json`;
+        a.click();
+      }
+
+      function clearAllData() {
+        if (confirm('⚠️ Xóa toàn bộ dữ liệu? Không thể khôi phục!')) {
+          if (confirm('⚠️⚠️ Xác nhận lần cuối?')) {
+            localStorage.removeItem('gachaCharacters');
+            localStorage.removeItem('adminResources');
+            alert('✅ Đã xóa!');
+            location.reload();
+          }
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const savedAdmin = sessionStorage.getItem('adminUser');
+        if (savedAdmin) {
+          currentAdmin = savedAdmin;
+          document.getElementById('currentAdmin').innerText = savedAdmin;
+          document.getElementById('loginModal').classList.add('hidden');
+          document.getElementById('mainPanel').style.display = 'block';
+          loadCharacters();
+        }
+      });
+
+      document.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter' && document.getElementById('adminPassword').value) {
+          adminLogin();
+        }
+      });
+    </script>
+  </body>
+</html>
