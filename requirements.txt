@@ -1,8 +1,8 @@
-# Backend Framework
-Flask==2.3.0
-Flask-CORS==4.0.0
-Flask-SocketIO==5.6.1
-Werkzeug==2.3.0
+# Backend Framework (compatible with Python 3.14)
+Flask>=3.0.0
+Flask-CORS>=4.0.0
+Flask-SocketIO>=5.6.1
+Werkzeug>=3.0.0
 
 # MongoDB
 pymongo==4.6.0
