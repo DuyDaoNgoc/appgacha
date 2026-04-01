@@ -1,0 +1,61 @@
+{
+  "name": "app-gacha-game",
+  "version": "1.0.0",
+  "description": "Honkai Star Rail Gacha Game - Full-Stack with Capacitor Android App & Flask MongoDB Backend",
+  "main": "app_backend.py",
+  "type": "module",
+  "scripts": {
+    "backend": "python app_backend.py",
+    "backend:dev": "python -u app_backend.py",
+    "backend:test": "python test_api.py",
+    "seed:db": "python seed_database.py",
+    "frontend:install": "cd project && npm install",
+    "frontend:build": "cd project && npm run build",
+    "android:sync": "cd project && npx cap sync android",
+    "android:build": "cd project && npx cap build android",
+    "android:run": "cd project && npx cap run android",
+    "android:open": "cd project && npx cap open android",
+    "prepare": "npm run frontend:install",
+    "test": "npm run backend:test"
+  },
+  "keywords": [
+    "gacha-game",
+    "honkai-star-rail",
+    "capacitor",
+    "android",
+    "flask",
+    "mongodb",
+    "socket.io",
+    "jwt",
+    "offline-first"
+  ],
+  "author": "DuyDaoNgoc",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DuyDaoNgoc/appgacha.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0",
+    "python": ">=3.9.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
+    "@capacitor/network": "^6.0.0",
+    "@capacitor/storage": "^6.0.0",
+    "@capacitor/filesystem": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "optionalDependencies": {
+    "sqlite3": "^5.1.6"
+  }
+}

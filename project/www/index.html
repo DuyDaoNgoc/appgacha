@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Honkai: Star Rail Gacha - Roll Banner</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(135deg, #0a0a15 0%, #1a0033 50%, #0a0a15 100%);
+        color: #fff;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .gacha-container {
+        display: grid;
+        grid-template-columns: 120px 1fr 380px;
+        height: 100vh;
+        gap: 0;
+      }
+
+      /* Left Sidebar - Character Selection */
+      .sidebar {
+        background: rgba(20, 10, 40, 0.9);
+        border-right: 2px solid rgba(255, 100, 200, 0.3);
+        overflow-y: auto;
+        padding: 10px;
+      }
+
+      .character-thumbs {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .char-thumb {
+        width: 100px;
+        height: 100px;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 2px solid rgba(255, 100, 200, 0.5);
+        background: rgba(40, 20, 60, 0.8);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .char-thumb:hover {
+        border-color: rgba(255, 100, 200, 1);
+        box-shadow: 0 0 15px rgba(255, 100, 200, 0.6);
+        transform: scale(1.05);
+      }
+
+      .char-thumb.active {
+        border-color: #ffff00;
+        box-shadow: 0 0 20px #ffff00;
+      }
+
+      .char-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .char-thumb.empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #666;
+      }
+
+      /* Center Banner Display */
+      .banner-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          180deg,
+          rgba(100, 50, 150, 0.3) 0%,
+          rgba(50, 100, 150, 0.3) 100%
+        );
+        position: relative;
+        overflow: hidden;
+      }
+
+      .character-showcase {
+        perspective: 1000px;
+        width: 300px;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      @media (max-height: 500px) {
+        .character-showcase {
+          width: 200px;
+          height: 280px;
+        }
+      }
+
+      @media (max-height: 400px) {
+        .character-showcase {
+          width: 150px;
+          height: 220px;
+        }
+      }
+
+      .character-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 20px;
+        transform: perspective(1200px) rotateY(0deg) rotateX(0deg);
+        transition: transform 0.1s ease;
+        filter: drop-shadow(0 0 30px rgba(255, 100, 200, 0.6));
+      }
+
+      .banner-name {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 14px;
+        color: #ffd700;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 8px 12px;
+        border-radius: 5px;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 50, 50, 0.8);
+        border: 2px solid #ff0000;
+        border-radius: 50%;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 100;
+      }
+
+      .close-btn:hover {
+        background: rgba(255, 50, 50, 1);
+        box-shadow: 0 0 15px rgba(255, 50, 50, 0.8);
+        transform: scale(1.1);
+      }
+
+      /* Right Panel - Banner Info & Controls */
+      .right-panel {
+        background: rgba(20, 10, 40, 0.95);
+        border-left: 2px solid rgba(255, 100, 200, 0.3);
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .banner-info {
+        flex: 1;
+      }
+
+      .banner-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #ffff00;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+      }
+
+      .rarity-display {
+        display: flex;
+        gap: 5px;
+        margin: 10px 0;
+      }
+
+      .star {
+        width: 20px;
+        height: 20px;
+        background: #ffd700;
+        clip-path: polygon(
+          50% 0%,
+          61% 35%,
+          98% 35%,
+          68% 57%,
+          79% 91%,
+          50% 70%,
+          21% 91%,
+          32% 57%,
+          2% 35%,
+          39% 35%
+        );
+      }
+
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 100, 200, 0.2);
+        font-size: 12px;
+      }
+
+      .stat-label {
+        color: #aaa;
+      }
+
+      .stat-value {
+        color: #ffff00;
+        font-weight: bold;
+      }
+
+      .description {
+        margin-top: 15px;
+        font-size: 11px;
+        color: #ccc;
+        line-height: 1.4;
+      }
+
+      /* Pull Controls */
+      .pull-controls {
+        margin-top: auto;
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .pull-counter {
+        flex: 1;
+        background: rgba(100, 50, 150, 0.3);
+        border: 2px solid rgba(255, 100, 200, 0.5);
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+      }
+
+      .gacha-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn-roll {
+        flex: 1;
+        padding: 12px 15px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+      }
+
+      .btn-roll-1 {
+        background: linear-gradient(135deg, #ff6600, #ff9900);
+        color: white;
+      }
+
+      .btn-roll-1:hover {
+        box-shadow: 0 0 15px rgba(255, 100, 0, 0.8);
+        transform: scale(1.05);
+      }
+
+      .btn-roll-10 {
+        background: linear-gradient(135deg, #ff00ff, #ff6600);
+        color: white;
+      }
+
+      .btn-roll-10:hover {
+        box-shadow: 0 0 15px rgba(255, 100, 150, 0.8);
+        transform: scale(1.05);
+      }
+
+      .settings-btn {
+        width: 100%;
+        padding: 10px;
+        background: rgba(100, 100, 200, 0.5);
+        border: 2px solid rgba(100, 100, 200, 0.7);
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+      }
+
+      .settings-btn:hover {
+        background: rgba(100, 100, 200, 0.8);
+        box-shadow: 0 0 10px rgba(100, 100, 200, 0.8);
+      }
+
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: linear-gradient(135deg, #1a0033, #2a0055);
+        border: 2px solid rgba(255, 100, 200, 0.8);
+        border-radius: 15px;
+        padding: 30px;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 0 30px rgba(255, 100, 200, 0.5);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .modal-header h2 {
+        color: #ffff00;
+      }
+
+      .modal-header .close {
+        background: rgba(255, 50, 50, 0.8);
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-body {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .modal-body input {
+        padding: 10px;
+        border: 2px solid rgba(255, 100, 200, 0.5);
+        background: rgba(50, 20, 80, 0.8);
+        color: white;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      .modal-body label {
+        color: #fff;
+        font-weight: bold;
+      }
+
+      .btn-save {
+        padding: 12px;
+        background: linear-gradient(135deg, #00ff00, #00cc00);
+        color: black;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-save:hover {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        transform: scale(1.05);
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(100, 50, 150, 0.2);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 100, 200, 0.5);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 100, 200, 0.8);
+      }
+
+      /* Results Modal */
+      .results-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg) scale(1);
+        }
+        50% {
+          transform: rotate(180deg) scale(1.05);
+        }
+        100% {
+          transform: rotate(360deg) scale(1);
+        }
+      }
+
+      .results-modal.active {
+        display: flex;
+      }
+
+      .results-content {
+        background: linear-gradient(135deg, #1a0033, #2a0055);
+        border: 3px solid rgba(255, 100, 200, 0.8);
+        border-radius: 15px;
+        padding: 20px;
+        max-width: 380px;
+        width: 90%;
+        max-height: 70vh;
+        overflow-y: auto;
+        animation: slideInUp 0.4s ease;
+        box-shadow:
+          0 0 30px rgba(255, 100, 200, 0.5),
+          inset 0 0 20px rgba(255, 100, 200, 0.2);
+      }
+
+      .result-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        margin: 8px 0;
+        background: rgba(100, 50, 150, 0.4);
+        border-left: 4px solid #ffff00;
+        border-radius: 5px;
+        animation: slideInUp 0.5s ease backwards;
+        transition: all 0.3s ease;
+      }
+
+      .result-item:hover {
+        background: rgba(150, 100, 200, 0.5);
+        transform: translateX(5px);
+        box-shadow: 0 0 15px rgba(255, 100, 200, 0.5);
+      }
+
+      .result-image {
+        width: 45px;
+        height: 45px;
+        border-radius: 5px;
+        object-fit: cover;
+        border: 2px solid rgba(255, 100, 200, 0.6);
+        flex-shrink: 0;
+      }
+
+      .result-info {
+        flex: 1;
+      }
+
+      .result-name {
+        font-weight: bold;
+        color: #ffff00;
+      }
+
+      .result-rarity {
+        font-size: 12px;
+        color: #aaa;
+      }
+
+      .btn-confirm-results {
+        width: 100%;
+        padding: 10px;
+        background: linear-gradient(135deg, #00ff00, #00cc00);
+        color: black;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-confirm-results:hover {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        transform: scale(1.02);
+      }
+
+      .btn-gacha.rolling {
+        animation: spin 0.8s ease-in-out;
+      }
+
+      @media (max-width: 768px) {
+        .gacha-container {
+          grid-template-columns: 80px 1fr 140px;
+          height: 100vh;
+          gap: 8px;
+          padding: 8px;
+        }
+
+        .sidebar {
+          padding: 5px;
+          border-radius: 8px;
+        }
+
+        .char-thumb {
+          width: 60px !important;
+          height: 60px !important;
+          border-radius: 6px;
+        }
+
+        .banner-display {
+          border-radius: 12px;
+        }
+
+        .character-showcase {
+          width: 180px !important;
+          height: 240px !important;
+        }
+
+        .character-image {
+          border-radius: 12px;
+        }
+
+        .right-panel {
+          padding: 8px;
+          width: 140px !important;
+          border-radius: 8px;
+          overflow-y: auto;
+        }
+
+        .banner-title {
+          font-size: 13px !important;
+          margin-bottom: 8px;
+        }
+
+        .rarity-display {
+          gap: 3px;
+          margin-bottom: 8px;
+        }
+
+        .star {
+          width: 14px !important;
+          height: 14px !important;
+        }
+
+        .stat-row {
+          padding: 3px 0 !important;
+          font-size: 10px !important;
+          margin-bottom: 2px;
+        }
+
+        .description {
+          font-size: 10px !important;
+          margin: 6px 0 !important;
+          line-height: 1.2;
+        }
+
+        .pull-controls {
+          margin: 8px 0;
+        }
+
+        .pull-counter {
+          padding: 6px 8px !important;
+          border-radius: 6px;
+        }
+
+        .pull-counter div:first-child {
+          font-size: 18px !important;
+        }
+
+        .pull-counter div:last-child {
+          font-size: 10px;
+        }
+
+        .gacha-buttons {
+          gap: 6px;
+          margin-bottom: 8px;
+        }
+
+        .btn-roll {
+          padding: 6px 8px !important;
+          font-size: 11px !important;
+          min-width: 50px !important;
+          height: 32px;
+        }
+
+        .settings-btn {
+          padding: 6px 8px !important;
+          font-size: 11px !important;
+          width: 100%;
+          height: 32px;
+        }
+
+        .banner-name {
+          font-size: 11px !important;
+          top: 10px;
+          left: 10px;
+          padding: 6px;
+        }
+
+        .close-btn {
+          width: 32px !important;
+          height: 32px !important;
+          font-size: 18px !important;
+          top: 10px;
+          right: 10px;
+        }
+      }
+
+      /* Landscape orientation - small screen */
+      @media (max-height: 500px) {
+        .gacha-container {
+          grid-template-columns: 60px 1fr 200px;
+          height: 100vh;
+        }
+
+        .sidebar {
+          padding: 5px;
+        }
+
+        .char-thumb {
+          width: 50px !important;
+          height: 50px !important;
+        }
+
+        .character-showcase {
+          width: 120px !important;
+          height: 160px !important;
+        }
+
+        .right-panel {
+          padding: 10px;
+          width: 200px !important;
+        }
+
+        .banner-title {
+          font-size: 14px !important;
+        }
+
+        .rarity-display {
+          gap: 3px;
+        }
+
+        .star {
+          width: 12px !important;
+          height: 12px !important;
+        }
+
+        .stat-row {
+          padding: 4px 0 !important;
+          font-size: 10px !important;
+        }
+
+        .description {
+          font-size: 11px !important;
+          margin: 8px 0 !important;
+        }
+
+        .pull-counter {
+          padding: 8px 10px !important;
+        }
+
+        .pull-counter div:first-child {
+          font-size: 20px !important;
+        }
+
+        .gacha-buttons {
+          gap: 8px;
+        }
+
+        .btn-roll {
+          padding: 8px 12px !important;
+          font-size: 12px !important;
+          min-width: 60px !important;
+        }
+
+        .settings-btn {
+          padding: 8px 12px !important;
+          font-size: 12px !important;
+        }
+
+        .banner-name {
+          font-size: 12px !important;
+        }
+
+        .close-btn {
+          width: 32px !important;
+          height: 32px !important;
+          font-size: 18px !important;
+        }
+      }
+
+      /* Extra small landscape */
+      @media (max-height: 400px) {
+        .gacha-container {
+          grid-template-columns: 50px 1fr 160px;
+        }
+
+        .char-thumb {
+          width: 40px !important;
+          height: 40px !important;
+        }
+
+        .character-showcase {
+          width: 100px !important;
+          height: 140px !important;
+        }
+
+        .right-panel {
+          padding: 8px;
+          width: 160px !important;
+        }
+
+        .banner-title {
+          font-size: 12px !important;
+        }
+
+        .stat-row {
+          padding: 2px 0 !important;
+          font-size: 9px !important;
+        }
+
+        .pull-counter div:first-child {
+          font-size: 18px !important;
+        }
+
+        .btn-roll {
+          padding: 6px 10px !important;
+          font-size: 11px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gacha-container">
+      <!-- Left Sidebar -->
+      <div class="sidebar">
+        <div class="character-thumbs" id="characterThumbs">
+          <!-- Character thumbnails will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Center Banner Display -->
+      <div class="banner-display">
+        <div class="banner-name" id="bannerName">Event Banner</div>
+        <button class="close-btn" onclick="closeGacha()">✕</button>
+        <div class="character-showcase">
+          <img id="characterImage" class="character-image" src="" alt="Character" />
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div class="right-panel">
+        <div class="banner-info">
+          <div class="banner-title" id="charName">Character Name</div>
+
+          <div class="rarity-display" id="rarityDisplay">
+            <!-- Stars will be populated by JavaScript -->
+          </div>
+
+          <div id="statsContainer">
+            <!-- Stats will be populated by JavaScript -->
+          </div>
+
+          <div class="description" id="charDescription">
+            <!-- Description will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <div class="pull-controls">
+          <div class="pull-counter">
+            <div id="pullCount">0</div>
+            <div style="font-size: 12px; color: #aaa">Pulls</div>
+          </div>
+        </div>
+
+        <div class="gacha-buttons">
+          <button class="btn-roll btn-roll-1" onclick="startGacha(1)">×1</button>
+          <button class="btn-roll btn-roll-10" onclick="startGacha(10)">×10</button>
+        </div>
+
+        <button class="settings-btn" onclick="openSettingsModal()">⚙️ Settings</button>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>⚙️ Settings</h2>
+          <button class="close" onclick="closeSettingsModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div>
+            <label>Server IP:</label>
+            <input type="text" id="serverIp" placeholder="e.g., 192.168.1.100" />
+          </div>
+          <div>
+            <label>Port:</label>
+            <input type="number" id="serverPort" placeholder="5000" value="5000" />
+          </div>
+          <div>
+            <label>Status: <span id="serverStatus">🔴 Offline</span></label>
+          </div>
+          <button class="btn-save" onclick="saveServerSettings()">💾 Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="resultsModal" class="results-modal">
+      <div class="results-content">
+        <h2 style="color: #ffff00; margin-bottom: 20px">🎉 Pull Results</h2>
+        <div id="resultsList"></div>
+        <button class="btn-confirm-results" onclick="confirmResults()">✅ Confirm</button>
+      </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="script.js"></script>
+    <script>
+      // Register Service Worker for performance
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('sw.js')
+            .then((reg) => console.log('Service Worker registered'))
+            .catch((err) => console.log('Service Worker registration failed:', err));
+        });
+      }
+    </script>
+  </body>
+</html>
