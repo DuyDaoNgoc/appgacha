@@ -5,7 +5,7 @@
 
 // Socket.io connection
 let socket = null;
-const API_URL = window.location.origin || 'http://172.16.0.18:5000';
+const API_URL = 'https://appgacha.onrender.com';
 
 // ============ Socket.io Setup ============
 function initializeSocket() {

@@ -1,5 +1,5 @@
 // ============ API Configuration ============
-const API_URL = 'http://172.16.0.18:5000';
+const API_URL = 'https://appgacha.onrender.com';
 
 // ============ Auth & User Management ============
 function getToken() {

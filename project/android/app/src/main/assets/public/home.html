@@ -807,7 +807,7 @@
           try {
             const token = localStorage.getItem('token');
             if (token) {
-              fetch('http://172.16.0.18:5000/api/logout', {
+              fetch('https://appgacha.onrender.com/api/logout', {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
                 keepalive: true,
