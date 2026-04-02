@@ -3,20 +3,13 @@ services:
     name: appgacha-backend
     runtime: python
     plan: free
-    buildCommand: 'pip install -r requirements.txt --no-cache-dir && pip uninstall gevent gunicorn -y && pip install gunicorn==21.2.0'
+    buildCommand: 'pip install -r requirements.txt --no-cache-dir'
     envVars:
-      - key: GEVENT_SUPPORT
-        value: 'false'
-      - key: PYTHONDONTWRITEBYTECODE
-        value: '1'
+      - key: FLASK_ENV
+        value: production
       - key: CORS_ORIGINS
         value: '*'
       - key: JWT_SECRET
         value: your-secret-key-change-me
       - key: MONGODB_URI
         value: mongodb+srv://AppMobile04:duypro0478@cluster0.tvfipwr.mongodb.net/appgacha?retryWrites=true&w=majority&ssl=true
-
-databases:
-  - name: appgacha-mongodb
-    databaseName: appgacha
-    plan: free
