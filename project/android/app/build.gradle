@@ -2,21 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     namespace "com.gachasimulator.app"
-    compileSdk 34
+    compileSdk 36
     defaultConfig {
         applicationId "com.gachasimulator.app"
-        minSdk 22
-        targetSdk 34
+        minSdk 24
+        targetSdk 36
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        aaptOptions {
-             // Strings and resources related to support for Unicode in the Windows console.
-             // (This comment is just filler based on previous context if needed)
-             instance {
-                 smartResMerge true
-             }
-        }
     }
     buildTypes {
         release {
@@ -42,7 +35,7 @@ dependencies {
     implementation project(':capacitor-cordova-android-plugins')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:core:3.6.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
 
 apply from: 'capacitor.build.gradle'

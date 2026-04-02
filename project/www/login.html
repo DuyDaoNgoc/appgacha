@@ -422,8 +422,13 @@
 
             showMessage('✅ Login successful!', 'success');
             setTimeout(() => {
-              window.location.href = 'home.html';
-            }, 1000);
+              // If in iframe, notify parent; otherwise redirect directly
+              if (window.parent !== window) {
+                window.parent.postMessage('LOGIN_SUCCESS', '*');
+              } else {
+                window.location.href = 'home.html';
+              }
+            }, 500);
           } else {
             showMessage(`❌ ${data.error}`, 'error');
           }
@@ -486,8 +491,13 @@
 
             showMessage('✅ Account created! Redirecting...', 'success');
             setTimeout(() => {
-              window.location.href = 'home.html';
-            }, 1000);
+              // If in iframe, notify parent; otherwise redirect directly
+              if (window.parent !== window) {
+                window.parent.postMessage('LOGIN_SUCCESS', '*');
+              } else {
+                window.location.href = 'home.html';
+              }
+            }, 500);
           } else {
             showMessage(`❌ ${data.error}`, 'error');
           }

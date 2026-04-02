@@ -13,9 +13,9 @@
       "attributes": [],
       "versionCode": 1,
       "versionName": "1.0",
-      "outputFile": "app-debug-1.0.apk"
+      "outputFile": "app-debug.apk"
     }
   ],
   "elementType": "File",
-  "minSdkVersionForDexing": 23
+  "minSdkVersionForDexing": 24
 }

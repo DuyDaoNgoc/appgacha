@@ -21,7 +21,7 @@ import hashlib
 
 # ============ Environment & Config ============
 load_dotenv()
-MONGO_URI = os.getenv('MONGODB_URI', 'mongodb+srv://pracelJS:Duy04@duy04.wdkexkx.mongodb.net/gacha-game?retryWrites=true&w=majority')
+MONGO_URI = os.getenv('MONGODB_URI', 'mongodb+srv://AppMobile04:duypro0478@cluster0.tvfipwr.mongodb.net/appgacha?retryWrites=true&w=majority&ssl=true')
 JWT_SECRET = os.getenv('JWT_SECRET', 'gacha-game-secret-2024')
 JWT_ALGORITHM = 'HS256'
 GACHA_COST = 160  # Xu per roll
@@ -33,10 +33,18 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # ============ MongoDB Connection ============
 try:
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    client = MongoClient(
+        MONGO_URI,
+        serverSelectionTimeoutMS=10000,
+        connectTimeoutMS=10000,
+        socketTimeoutMS=10000,
+        retryWrites=True,
+        ssl=True,
+        tlsAllowInvalidCertificates=False
+    )
     client.admin.command('ping')
     print("✅ MongoDB Atlas connected!")
-    db = client['gacha-game']
+    db = client['appgacha']
 except Exception as e:
     print(f"❌ MongoDB failed: {e}")
     db = None

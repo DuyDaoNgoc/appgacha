@@ -4,7 +4,7 @@
             "outputFile": "com.gachasimulator.app.test.app-debugAndroidTest-5:/values-v21_values-v21.arsc.flat",
             "map": [
                 {
-                    "source": "D:\\.gradle\\caches\\8.11.1\\transforms\\0dfb94e8e9f7930d0d4cbce98a17f1aa\\transformed\\core-1.6.1\\res\\values-v21\\values.xml",
+                    "source": "D:\\.gradle\\caches\\8.11.1\\transforms\\eb2774be1038300bee625c3fb7aa7921\\transformed\\jetified-core-1.6.1\\res\\values-v21\\values.xml",
                     "from": {
                         "startLines": "4,13",
                         "startColumns": "0,0",
@@ -28,7 +28,7 @@
             "outputFile": "com.gachasimulator.app.test.app-debugAndroidTest-5:/values-v18_values-v18.arsc.flat",
             "map": [
                 {
-                    "source": "D:\\.gradle\\caches\\8.11.1\\transforms\\0dfb94e8e9f7930d0d4cbce98a17f1aa\\transformed\\core-1.6.1\\res\\values-v18\\values.xml",
+                    "source": "D:\\.gradle\\caches\\8.11.1\\transforms\\eb2774be1038300bee625c3fb7aa7921\\transformed\\jetified-core-1.6.1\\res\\values-v18\\values.xml",
                     "from": {
                         "startLines": "4,12",
                         "startColumns": "0,0",
@@ -52,7 +52,7 @@
             "outputFile": "com.gachasimulator.app.test.app-debugAndroidTest-5:/values_values.arsc.flat",
             "map": [
                 {
-                    "source": "D:\\.gradle\\caches\\8.11.1\\transforms\\0dfb94e8e9f7930d0d4cbce98a17f1aa\\transformed\\core-1.6.1\\res\\values\\values.xml",
+                    "source": "D:\\.gradle\\caches\\8.11.1\\transforms\\eb2774be1038300bee625c3fb7aa7921\\transformed\\jetified-core-1.6.1\\res\\values\\values.xml",
                     "from": {
                         "startLines": "4,11",
                         "startColumns": "0,0",
@@ -76,7 +76,7 @@
             "outputFile": "com.gachasimulator.app.test.app-debugAndroidTest-5:/values-v28_values-v28.arsc.flat",
             "map": [
                 {
-                    "source": "D:\\.gradle\\caches\\8.11.1\\transforms\\0dfb94e8e9f7930d0d4cbce98a17f1aa\\transformed\\core-1.6.1\\res\\values-v28\\values.xml",
+                    "source": "D:\\.gradle\\caches\\8.11.1\\transforms\\eb2774be1038300bee625c3fb7aa7921\\transformed\\jetified-core-1.6.1\\res\\values-v28\\values.xml",
                     "from": {
                         "startLines": "4,13",
                         "startColumns": "0,0",

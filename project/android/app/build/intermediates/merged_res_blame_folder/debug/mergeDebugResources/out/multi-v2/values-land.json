@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.gachasimulator.app-mergeDebugResources-25:/values-land/values-land.xml",
+            "outputFile": "com.gachasimulator.app-mergeDebugResources-26:/values-land/values-land.xml",
             "map": [
                 {
-                    "source": "D:\\.gradle\\caches\\8.11.1\\transforms\\dda665aa4a1576cfb1759fb2bbcd5279\\transformed\\appcompat-1.7.0\\res\\values-land\\values-land.xml",
+                    "source": "D:\\.gradle\\caches\\8.11.1\\transforms\\c63d51513cc9be9e6ed2098e54b37f2b\\transformed\\appcompat-1.7.1\\res\\values-land\\values-land.xml",
                     "from": {
                         "startLines": "2,3,4",
                         "startColumns": "4,4,4",

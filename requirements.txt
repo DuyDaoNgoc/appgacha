@@ -28,8 +28,6 @@ requests>=2.31.0
 
 # Production Server
 gunicorn>=21.2.0
-gevent>=24.0.0
-gevent-websocket>=0.10.1
 
 # Utilities
 click>=8.3.1

@@ -64,8 +64,6 @@ project/android/build/
 project/android/app/build/
 project/android/.gradle/
 project/android/local.properties
-project/android/gradlew
-project/android/gradlew.bat
 
 # iOS Build
 project/ios/Pods/
@@ -75,7 +73,7 @@ project/ios/build/
 # Capacitor
 capacitor-cordova-android-plugins/
 .capacitor/
-android/
+# android/  <-- Removed this to allow android project files
 ios/
 
 # Test Coverage
