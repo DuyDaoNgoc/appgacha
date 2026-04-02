@@ -4,6 +4,7 @@ services:
     runtime: python
     plan: free
     buildCommand: 'pip install -r requirements.txt --no-cache-dir'
+    startCommand: 'gunicorn --workers 1 --worker-class sync --timeout 120 --bind 0.0.0.0:$PORT app_backend_clean:app'
     envVars:
       - key: FLASK_ENV
         value: production
