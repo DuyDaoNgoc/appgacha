@@ -127,7 +127,7 @@ def health():
 @app.route('/api/auth/register', methods=['POST'])
 def register():
     """Register new user"""
-    if not db:
+    if db is None:
         return jsonify({'error': 'Database not connected'}), 500
 
     try:
@@ -173,7 +173,7 @@ def register():
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     """Login user"""
-    if not db:
+    if db is None:
         return jsonify({'error': 'Database not connected'}), 500
 
     try:
@@ -215,7 +215,7 @@ def login():
 @token_required
 def get_profile(user_id):
     """Get user profile"""
-    if not db:
+    if db is None:
         return jsonify({'error': 'Database not connected'}), 500
 
     try:
@@ -241,7 +241,7 @@ def get_profile(user_id):
 @token_required
 def add_currency(user_id):
     """Add xu or stars to user (Admin only)"""
-    if not db:
+    if db is None:
         return jsonify({'error': 'Database not connected'}), 500
 
     try:
@@ -273,7 +273,7 @@ def add_currency(user_id):
 @token_required
 def gacha_roll(user_id):
     """Perform gacha roll - costs 160 xu per roll"""
-    if not db:
+    if db is None:
         return jsonify({'error': 'Database not connected'}), 500
 
     try:
@@ -351,7 +351,7 @@ def gacha_roll(user_id):
 @token_required
 def get_mailbox(user_id):
     """Get user mailbox messages"""
-    if not db:
+    if db is None:
         return jsonify({'error': 'Database not connected'}), 500
 
     try:
@@ -374,7 +374,7 @@ def get_mailbox(user_id):
 @token_required
 def claim_reward(user_id, message_id):
     """Claim reward from mailbox message"""
-    if not db:
+    if db is None:
         return jsonify({'error': 'Database not connected'}), 500
 
     try:
@@ -426,7 +426,7 @@ def claim_reward(user_id, message_id):
 @app.route('/api/admin/mailbox/send', methods=['POST'])
 def admin_send_message():
     """Admin: Send message to user"""
-    if not db:
+    if db is None:
         return jsonify({'error': 'Database not connected'}), 500
 
     try:
