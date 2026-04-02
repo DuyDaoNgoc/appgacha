@@ -479,10 +479,15 @@ def admin_send_message():
 def get_online_players():
     """Get list of online users"""
     if not db:
+        print("⚠️  Database not connected, returning empty online users list")
         return jsonify({'online_users': []}), 200
 
     try:
         users = get_collection('users')
+        if users is None:
+            print("⚠️  Could not access users collection")
+            return jsonify({'online_users': []}), 200
+
         online = list(users.find(
             {'online': True},
             {'username': 1, 'level': 1}
@@ -494,7 +499,8 @@ def get_online_players():
         return jsonify({'online_users': online}), 200
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"❌ Error getting online players: {str(e)}")
+        return jsonify({'online_users': [], 'error': str(e)}), 200
 
 # ============ Socket.io Online Status ============
 # Track connected users in memory

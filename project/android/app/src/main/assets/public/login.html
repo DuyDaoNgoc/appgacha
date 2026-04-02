@@ -486,7 +486,7 @@
       async function loadOnlineUsers() {
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
           const response = await fetch(`${API_URL}/api/online-users`, {
             signal: controller.signal,
@@ -494,7 +494,7 @@
           clearTimeout(timeoutId);
 
           if (!response.ok) {
-            console.error(`API error: ${response.status} ${response.statusText}`);
+            console.warn(`API warning: ${response.status} ${response.statusText}`);
             return;
           }
 
@@ -518,7 +518,10 @@
               .join('');
           }
         } catch (e) {
-          console.error('Could not load online users:', e.message);
+          // Silently fail - network issue, will retry in 3 seconds
+          if (e.name !== 'AbortError') {
+            console.debug('Could not load online users:', e.message);
+          }
         }
       }
 
