@@ -478,7 +478,7 @@ def admin_send_message():
 @app.route('/api/online-users', methods=['GET'])
 def get_online_players():
     """Get list of online users"""
-    if not db:
+    if db is None:
         print("⚠️  Database not connected, returning empty online users list")
         return jsonify({'online_users': []}), 200
 
