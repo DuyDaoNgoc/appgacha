@@ -407,19 +407,6 @@
             localStorage.setItem('xu', data.xu);
             localStorage.setItem('stars', data.stars);
 
-            // Set user online
-            try {
-              await fetch(`${API_URL}/api/user/online`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${data.token}`,
-                },
-              });
-            } catch (e) {
-              console.log('Set online failed (non-critical):', e);
-            }
-
             showMessage('✅ Login successful!', 'success');
             setTimeout(() => {
               // If in iframe, notify parent; otherwise redirect directly
@@ -475,19 +462,6 @@
             localStorage.setItem('token', data.token);
             localStorage.setItem('user_id', data.user_id);
             localStorage.setItem('username', data.username);
-
-            // Set user online
-            try {
-              await fetch(`${API_URL}/api/user/online`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${data.token}`,
-                },
-              });
-            } catch (e) {
-              console.log('Set online failed (non-critical):', e);
-            }
 
             showMessage('✅ Account created! Redirecting...', 'success');
             setTimeout(() => {
