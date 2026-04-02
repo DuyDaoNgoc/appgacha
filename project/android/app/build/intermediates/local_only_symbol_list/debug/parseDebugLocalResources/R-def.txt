@@ -17,3 +17,4 @@ style AppTheme.NoActionBar
 style AppTheme.NoActionBarLaunch
 xml config
 xml file_paths
+xml network_security_config
