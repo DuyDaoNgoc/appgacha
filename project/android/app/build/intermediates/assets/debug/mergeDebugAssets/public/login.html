@@ -263,8 +263,8 @@
     <div class="login-container">
       <div class="login-card">
         <div class="logo">
-          <div class="logo-text">✨ HSR Gacha ✨</div>
-          <div class="logo-subtitle">Honkai Star Rail</div>
+          <div class="logo-text">✨ Gacha BÒ Đen✨</div>
+          <div class="logo-subtitle">Bốn thòn lèn</div>
         </div>
 
         <!-- Tab Buttons -->
@@ -422,8 +422,13 @@
 
             showMessage('✅ Login successful!', 'success');
             setTimeout(() => {
-              window.location.href = 'home.html';
-            }, 1000);
+              // If in iframe, notify parent; otherwise redirect directly
+              if (window.parent !== window) {
+                window.parent.postMessage('LOGIN_SUCCESS', '*');
+              } else {
+                window.location.href = 'home.html';
+              }
+            }, 500);
           } else {
             showMessage(`❌ ${data.error}`, 'error');
           }
@@ -486,8 +491,13 @@
 
             showMessage('✅ Account created! Redirecting...', 'success');
             setTimeout(() => {
-              window.location.href = 'home.html';
-            }, 1000);
+              // If in iframe, notify parent; otherwise redirect directly
+              if (window.parent !== window) {
+                window.parent.postMessage('LOGIN_SUCCESS', '*');
+              } else {
+                window.location.href = 'home.html';
+              }
+            }, 500);
           } else {
             showMessage(`❌ ${data.error}`, 'error');
           }
