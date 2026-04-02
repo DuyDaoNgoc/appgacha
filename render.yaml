@@ -3,7 +3,7 @@ services:
     name: appgacha-backend
     runtime: python
     plan: free
-    buildCommand: 'pip install --upgrade pip setuptools wheel && pip install -r requirements.txt --no-cache-dir && pip uninstall gevent -y 2>/dev/null || true'
+    buildCommand: 'rm -rf ~/.cache/pip && pip install --upgrade pip && pip install -r requirements.txt && pip uninstall gevent -y || true'
     startCommand: 'gunicorn --workers 1 --worker-class sync --timeout 120 --bind 0.0.0.0:$PORT app_backend_clean:app'
     envVars:
       - key: FLASK_ENV
@@ -14,3 +14,5 @@ services:
         value: your-secret-key-change-me
       - key: MONGODB_URI
         value: mongodb+srv://AppMobile04:duypro0478@cluster0.tvfipwr.mongodb.net/appgacha?retryWrites=true&w=majority&ssl=true
+      - key: CACHE_BUSTER
+        value: 'v1'
