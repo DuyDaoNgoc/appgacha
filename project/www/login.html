@@ -511,7 +511,19 @@
       // Load online users
       async function loadOnlineUsers() {
         try {
-          const response = await fetch(`${API_URL}/api/online-users`);
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+          const response = await fetch(`${API_URL}/api/online-users`, {
+            signal: controller.signal,
+          });
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            console.error(`API error: ${response.status} ${response.statusText}`);
+            return;
+          }
+
           const data = await response.json();
           const users = data.online_users || [];
 
@@ -532,7 +544,7 @@
               .join('');
           }
         } catch (e) {
-          console.log('Could not load online users');
+          console.error('Could not load online users:', e.message);
         }
       }
 

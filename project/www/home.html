@@ -495,7 +495,7 @@
   <body>
     <div class="home-container">
       <div class="header">
-        <div class="title">✨ HSR Gacha ✨</div>
+        <div class="title">✨ Gacha Bốn Thòn Lèn ✨</div>
         <div class="subtitle">Chọn banner để roll</div>
       </div>
 
@@ -601,6 +601,9 @@
     </div>
 
     <script>
+      // ============ API Configuration ============
+      const API_URL = 'https://appgacha.onrender.com';
+
       function loadBanners() {
         let bannersData = JSON.parse(localStorage.getItem('gachaBanners') || '[]');
         if (bannersData.length === 0) {
@@ -807,7 +810,7 @@
           try {
             const token = localStorage.getItem('token');
             if (token) {
-              fetch('http://172.16.0.18:5000/api/logout', {
+              fetch(`${API_URL}/api/logout`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
                 keepalive: true,
@@ -826,7 +829,7 @@
         const token = localStorage.getItem('token');
         if (token) {
           try {
-            fetch('http://172.16.0.18:5000/api/logout', {
+            fetch('https://appgacha.onrender.com/api/logout', {
               method: 'POST',
               headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
               keepalive: true,

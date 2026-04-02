@@ -1,5 +1,5 @@
 // Service Worker - Cache Strategy for Performance
-const CACHE_NAME = 'hsr-gacha-v1';
+const CACHE_NAME = 'hsr-gacha-v2-bo-den';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
