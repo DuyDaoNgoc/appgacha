@@ -1,1 +1,10 @@
-{}
+{
+  "appId": "com.gachasimulator.app",
+  "appName": "Gacha Bò Đen",
+  "webDir": "public",
+  "bundledWebRuntime": false,
+  "server": {
+    "allowNavigation": ["appgacha.onrender.com"],
+    "cleartext": true
+  }
+}
