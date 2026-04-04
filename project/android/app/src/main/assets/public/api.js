@@ -128,6 +128,65 @@ async function claimReward(messageId) {
   }
 }
 
+// ============ Gacha UI ============
+async function startGacha(rolls = 1) {
+  const xuDisplay = document.querySelector('.xu-display');
+  const currentXu = parseInt(xuDisplay?.textContent || 0);
+
+  if (rolls === 10 && currentXu < 10) {
+    showNotification('❌ Not enough Xu for 10 rolls!', 'error');
+    return;
+  }
+  if (rolls === 1 && currentXu < 1) {
+    showNotification('❌ Not enough Xu for 1 roll!', 'error');
+    return;
+  }
+
+  // Disable button during gacha
+  const buttons = document.querySelectorAll('.btn-roll');
+  buttons.forEach((btn) => (btn.disabled = true));
+
+  const result = await performGacha(rolls);
+
+  if (result.success) {
+    // Update UI
+    const xuDisplay = document.querySelector('.xu-display');
+    if (xuDisplay) xuDisplay.textContent = result.xu_remaining;
+
+    // Show results
+    if (result.results && result.results.length > 0) {
+      const resultNames = result.results.map((char) => `⭐ ${char.name}`).join('\n');
+      showNotification(`🎉 Gacha Results:\n${resultNames}`, 'success');
+    }
+  }
+
+  // Re-enable button
+  buttons.forEach((btn) => (btn.disabled = false));
+}
+
+// ============ Settings Modal ============
+function openSettingsModal() {
+  const modal = document.getElementById('settingsModal');
+  if (modal) {
+    modal.style.display = 'block';
+  }
+}
+
+function closeSettingsModal() {
+  const modal = document.getElementById('settingsModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Close modal when clicking outside of it
+window.addEventListener('click', (event) => {
+  const modal = document.getElementById('settingsModal');
+  if (modal && event.target === modal) {
+    modal.style.display = 'none';
+  }
+});
+
 // ============ Notification System ============
 function showNotification(message, type = 'info') {
   const notification = document.createElement('div');
