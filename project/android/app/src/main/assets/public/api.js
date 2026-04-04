@@ -1,6 +1,33 @@
 // ============ API Configuration ============
 const API_URL = 'https://appgacha.onrender.com';
 
+// ============ Retry Helper ============
+async function fetchWithRetry(url, options = {}, retries = 3, delay = 2000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.log(`API Attempt ${i + 1}/${retries} failed:`, error.message);
+
+      if (i < retries - 1) {
+        // Wait before retrying (exponential backoff)
+        await new Promise((r) => setTimeout(r, delay * (i + 1)));
+      }
+    }
+  }
+  throw new Error('API call failed after multiple retries');
+}
+
 // ============ Auth & User Management ============
 function getToken() {
   return localStorage.getItem('token');
@@ -24,7 +51,7 @@ function checkAuth() {
 
 async function getUserProfile() {
   try {
-    const response = await fetch(`${API_URL}/api/user/profile`, {
+    const response = await fetchWithRetry(`${API_URL}/api/user/profile`, {
       method: 'GET',
       headers: getAuthHeader(),
     });
@@ -56,11 +83,16 @@ async function performGacha(rolls = 1) {
   }
 
   try {
-    const response = await fetch(`${API_URL}/api/gacha/roll`, {
-      method: 'POST',
-      headers: getAuthHeader(),
-      body: JSON.stringify({ rolls: rolls }),
-    });
+    const response = await fetchWithRetry(
+      `${API_URL}/api/gacha/roll`,
+      {
+        method: 'POST',
+        headers: getAuthHeader(),
+        body: JSON.stringify({ rolls: rolls }),
+      },
+      3,
+      2000
+    );
 
     const data = await response.json();
 
@@ -88,10 +120,15 @@ async function loadMailbox() {
   if (!token) return [];
 
   try {
-    const response = await fetch(`${API_URL}/api/mailbox/messages`, {
-      method: 'GET',
-      headers: getAuthHeader(),
-    });
+    const response = await fetchWithRetry(
+      `${API_URL}/api/mailbox/messages`,
+      {
+        method: 'GET',
+        headers: getAuthHeader(),
+      },
+      2,
+      1000
+    );
 
     const data = await response.json();
     return data.messages || [];
@@ -106,10 +143,15 @@ async function claimReward(messageId) {
   if (!token) return false;
 
   try {
-    const response = await fetch(`${API_URL}/api/mailbox/claim/${messageId}`, {
-      method: 'POST',
-      headers: getAuthHeader(),
-    });
+    const response = await fetchWithRetry(
+      `${API_URL}/api/mailbox/claim/${messageId}`,
+      {
+        method: 'POST',
+        headers: getAuthHeader(),
+      },
+      2,
+      1000
+    );
 
     const data = await response.json();
 
@@ -219,10 +261,15 @@ async function logout() {
       const token = getToken();
       if (token) {
         // Call backend to set offline status
-        await fetch(`${API_URL}/api/logout`, {
-          method: 'POST',
-          headers: getAuthHeader(),
-        }).catch((e) => console.log('Logout API call failed (non-critical):', e));
+        await fetchWithRetry(
+          `${API_URL}/api/logout`,
+          {
+            method: 'POST',
+            headers: getAuthHeader(),
+          },
+          2,
+          1000
+        ).catch((e) => console.log('Logout API call failed (non-critical):', e));
       }
     } catch (e) {
       console.log('Logout error:', e);

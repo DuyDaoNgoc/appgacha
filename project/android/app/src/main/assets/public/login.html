@@ -448,6 +448,37 @@
         }, 3000);
       }
 
+      // Retry logic for mobile connectivity
+      async function fetchWithRetry(url, options, retries = 3, delay = 2000) {
+        for (let i = 0; i < retries; i++) {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+            const response = await fetch(url, {
+              ...options,
+              signal: controller.signal,
+            });
+
+            clearTimeout(timeoutId);
+            return response;
+          } catch (error) {
+            clearTimeout(timeoutId);
+            console.log(`Attempt ${i + 1} failed:`, error.message);
+
+            if (i < retries - 1) {
+              // Show retry message for first few failures
+              if (i === 1) {
+                showMessage(`⏳ Đang kết nối... (Lần ${i + 1}/${retries})`, 'info');
+              }
+              // Wait before retrying (exponential backoff)
+              await new Promise((r) => setTimeout(r, delay * (i + 1)));
+            }
+          }
+        }
+        throw new Error('Connection failed after multiple retries');
+      }
+
       // Handle Login
       async function handleLogin() {
         const username = document.getElementById('loginUsername').value.trim();
@@ -460,12 +491,18 @@
 
         try {
           document.getElementById('loading').style.display = 'block';
+          showMessage('⏳ Đang kết nối...', 'info');
 
-          const response = await fetch(`${API_URL}/api/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-          });
+          const response = await fetchWithRetry(
+            `${API_URL}/api/auth/login`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, password }),
+            },
+            3,
+            2000
+          );
 
           const data = await response.json();
 
@@ -481,10 +518,11 @@
               window.location.href = 'home.html';
             }, 500);
           } else {
-            showMessage(`❌ ${data.error}`, 'error');
+            showMessage(`❌ ${data.error || 'Login failed'}`, 'error');
           }
         } catch (e) {
-          showMessage('❌ Kết nối thất bại', 'error');
+          console.error('Login error:', e);
+          showMessage('❌ Kết nối thất bại. Kiểm tra internet hoặc thử lại sau.', 'error');
         } finally {
           document.getElementById('loading').style.display = 'none';
         }
@@ -513,12 +551,18 @@
 
         try {
           document.getElementById('loading').style.display = 'block';
+          showMessage('⏳ Đang tạo tài khoản...', 'info');
 
-          const response = await fetch(`${API_URL}/api/auth/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-          });
+          const response = await fetchWithRetry(
+            `${API_URL}/api/auth/register`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, password }),
+            },
+            3,
+            2000
+          );
 
           const data = await response.json();
 
@@ -534,10 +578,11 @@
               window.location.href = 'home.html';
             }, 500);
           } else {
-            showMessage(`❌ ${data.error}`, 'error');
+            showMessage(`❌ ${data.error || 'Registration failed'}`, 'error');
           }
         } catch (e) {
-          showMessage('❌ Kết nối thất bại', 'error');
+          console.error('Register error:', e);
+          showMessage('❌ Kết nối thất bại. Kiểm tra internet hoặc thử lại sau.', 'error');
         } finally {
           document.getElementById('loading').style.display = 'none';
         }
